@@ -37,7 +37,7 @@ public class UserController {
     @DeleteMapping("/{userId}")
     public ResponseEntity<Object> deleteUserById(@PathVariable UUID userId) {
         Optional<User> userOptional = userService.findById(userId);
-        if(!userOptional.isPresent()){
+        if(userOptional.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         } else {
             userService.delete(userOptional.get());
@@ -49,7 +49,7 @@ public class UserController {
     public ResponseEntity<Object> updateUser(@PathVariable UUID userId,
                                              @RequestBody @JsonView(UserDto.UserView.UserPut.class) UserDto userDto) {
         Optional<User> userOptional = userService.findById(userId);
-        if(!userOptional.isPresent()){
+        if(userOptional.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         } else {
             var user = userOptional.get();
@@ -66,7 +66,7 @@ public class UserController {
     public ResponseEntity<Object> updatePassword(@PathVariable UUID userId,
                                                  @RequestBody @JsonView(UserDto.UserView.PasswordPut.class) UserDto userDto) {
         Optional<User> userOptional = userService.findById(userId);
-        if(!userOptional.isPresent()){
+        if(userOptional.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         } else if (!userOptional.get().getPassword().equals(userDto.getOldPassword())){
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: Mismatched old password.");
@@ -83,7 +83,7 @@ public class UserController {
     public ResponseEntity<Object> updateImage(@PathVariable UUID userId,
                                               @RequestBody @JsonView(UserDto.UserView.ImagePut.class) UserDto userDto) {
         Optional<User> userOptional = userService.findById(userId);
-        if(!userOptional.isPresent()){
+        if(userOptional.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         } else {
             var user = userOptional.get();
