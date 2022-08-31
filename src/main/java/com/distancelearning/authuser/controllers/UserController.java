@@ -20,6 +20,9 @@ import java.time.ZoneId;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @RestController
 @RequestMapping("/users")
 @AllArgsConstructor
@@ -33,6 +36,13 @@ public class UserController {
                                                   @PageableDefault (page = 0, size = 5, sort = "userId",
                                                           direction = Sort.Direction.ASC) Pageable pageable) {
         Page<User> userPage = userService.findAll(spec, pageable);
+
+        //Hateoas implementation
+        if (!userPage.isEmpty()){
+            for (User user : userPage.toList()){
+                user.add(linkTo(methodOn(UserController.class).getUserById(user.getUserId())).withSelfRel());
+            }
+        }
         return ResponseEntity.status(HttpStatus.OK).body(userPage);
     }
 
