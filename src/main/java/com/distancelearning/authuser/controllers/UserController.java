@@ -3,6 +3,7 @@ package com.distancelearning.authuser.controllers;
 import com.distancelearning.authuser.dtos.UserDto;
 import com.distancelearning.authuser.models.User;
 import com.distancelearning.authuser.services.UserService;
+import com.distancelearning.authuser.specifications.SpecificationTemplate;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,8 +29,10 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<Page<User>> getAllUsers(@PageableDefault (page = 0, size = 5, sort = "userId", direction = Sort.Direction.ASC) Pageable pageable) {
-        Page<User> userPage = userService.findAll(pageable);
+    public ResponseEntity<Page<User>> getAllUsers(SpecificationTemplate.UserSpec spec,
+                                                  @PageableDefault (page = 0, size = 5, sort = "userId",
+                                                          direction = Sort.Direction.ASC) Pageable pageable) {
+        Page<User> userPage = userService.findAll(spec, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(userPage);
     }
 
