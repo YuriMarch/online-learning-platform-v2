@@ -36,8 +36,14 @@ public class UserController {
     @GetMapping
     public ResponseEntity<Page<User>> getAllUsers(SpecificationTemplate.UserSpec spec,
                                                   @PageableDefault (page = 0, size = 5, sort = "userId",
-                                                          direction = Sort.Direction.ASC) Pageable pageable) {
-        Page<User> userPage = userService.findAll(spec, pageable);
+                                                          direction = Sort.Direction.ASC) Pageable pageable,
+                                                  @RequestParam(required = false) UUID courseId) {
+        Page<User> userPage = null;
+        if (courseId != null){
+            userPage = userService.findAll(SpecificationTemplate.userCourseId(courseId).and(spec), pageable);
+        } else {
+            userPage = userService.findAll(spec, pageable);
+        }
 
         //Hateoas implementation
         if (!userPage.isEmpty()){
