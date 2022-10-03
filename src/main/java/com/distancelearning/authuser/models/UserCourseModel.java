@@ -1,15 +1,17 @@
 package com.distancelearning.authuser.models;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.UUID;
 
-@Data
+@Getter @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "TB_USERS_COURSES")
 public class UserCourseModel implements Serializable {
     private static final long serialVersionUID = 1L;
