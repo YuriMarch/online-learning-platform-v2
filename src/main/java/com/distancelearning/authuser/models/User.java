@@ -19,7 +19,7 @@ import java.util.UUID;
 @Getter @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Entity
-@Table(name = "TB_USERS")
+@Table(name = "TB_USERS") //Serializable converts Java objects to a sequence of bytes that can be stored in DB
 public class User extends RepresentationModel<User> implements Serializable {
     private static final long serialVersionUID = 1L;
 
