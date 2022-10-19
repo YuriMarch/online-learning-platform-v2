@@ -23,7 +23,6 @@ import java.util.UUID;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/users/{userId}/courses")
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Log4j2
 public class UserCourseController {
@@ -34,7 +33,7 @@ public class UserCourseController {
 
     private final UserCourseService userCourseService;
 
-    @GetMapping
+    @GetMapping("/users/{userId}/courses")
     public ResponseEntity<Page<CourseDto>> getAllCoursesByUser(@PathVariable UUID userId,
                                                                @PageableDefault(page = 0, size = 5, sort = "courseId",
                                                                 direction = Sort.Direction.ASC) Pageable pageable){
@@ -42,7 +41,7 @@ public class UserCourseController {
         return ResponseEntity.status(HttpStatus.OK).body(courseClient.getAllCoursesByUser(userId, pageable));
     }
 
-    @PostMapping("/subscription")
+    @PostMapping("/users/{userId}/courses/subscription")
     public ResponseEntity<Object> saveSubscriptionUserInCourse(@PathVariable UUID userId, @RequestBody @Valid UserCourseDto userCourseDto){
         Optional<User> userOptional = userService.findById(userId);
         if(userOptional.isEmpty()){
@@ -53,6 +52,16 @@ public class UserCourseController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: subscription already exists.");
         }
 
-        UserCourseModel userCourseModel = userCourseService.save(userOptional.get().convertToUserCourseModel(userCourseDto.getCourseId()));        return ResponseEntity.status(HttpStatus.OK).body(userCourseModel);
+        UserCourseModel userCourseModel = userCourseService.save(userOptional.get().convertToUserCourseModel(userCourseDto.getCourseId()));
+        return ResponseEntity.status(HttpStatus.OK).body(userCourseModel);
+    }
+
+    @DeleteMapping("users/courses/{courseId}")
+    public ResponseEntity<Object> deleteUserCourseByCourse(@PathVariable UUID courseId){
+        if (!userCourseService.existsByCourseId(courseId)){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("UserCourse not found.");
+        }
+        userCourseService.deleteUserCourseByCourse(courseId);
+        return ResponseEntity.status(HttpStatus.OK).body("UserCourse successfully deleted.");
     }
 }
