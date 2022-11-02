@@ -6,6 +6,7 @@ import com.distancelearning.authuser.models.UserCourseModel;
 import com.distancelearning.authuser.repositories.UserCourseRepository;
 import com.distancelearning.authuser.repositories.UserRepository;
 import com.distancelearning.authuser.services.UserService;
+import com.distancelearning.authuser.specifications.SpecificationTemplate;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -70,5 +71,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    @Override
+    public Page<User> findAllInstructors(SpecificationTemplate.UserSpec spec, Pageable pageable) {
+        return userRepository.findAllInstructors(spec, pageable);
     }
 }
