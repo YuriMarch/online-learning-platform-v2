@@ -1,5 +1,6 @@
 package com.distancelearning.authuser.services.impl;
 
+import com.distancelearning.authuser.clients.CourseClient;
 import com.distancelearning.authuser.models.User;
 import com.distancelearning.authuser.models.UserCourseModel;
 import com.distancelearning.authuser.repositories.UserCourseRepository;
@@ -24,6 +25,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserCourseRepository userCourseRepository;
 
+    private final CourseClient courseClient;
+
     @Override
     public List<User> findAll() {
         return userRepository.findAll();
@@ -42,11 +45,16 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void delete(User user) {
+        boolean deleteUserCourseInCourse = false;
         List<UserCourseModel> userCourseModelList = userCourseRepository.findAllUserCourseIntoUser(user.getUserId());
         if (!userCourseModelList.isEmpty()){
             userCourseRepository.deleteAll(userCourseModelList);
+            deleteUserCourseInCourse = true;
         }
         userRepository.delete(user);
+        if (deleteUserCourseInCourse){
+            courseClient.deleteUserInCourse(user.getUserId());
+        }
     }
 
     @Override

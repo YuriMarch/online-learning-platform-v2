@@ -1,15 +1,13 @@
 package com.distancelearning.authuser.controllers;
 
 import com.distancelearning.authuser.clients.CourseClient;
-import com.distancelearning.authuser.dtos.CourseDto;
 import com.distancelearning.authuser.dtos.UserCourseDto;
 import com.distancelearning.authuser.models.User;
 import com.distancelearning.authuser.models.UserCourseModel;
 import com.distancelearning.authuser.services.UserCourseService;
 import com.distancelearning.authuser.services.UserService;
-import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Page;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -22,22 +20,27 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@AllArgsConstructor
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Log4j2
 public class UserCourseController {
 
-    private final CourseClient courseClient;
+    @Autowired
+    CourseClient courseClient;
 
-    private final UserService userService;
+    @Autowired
+    UserService userService;
 
-    private final UserCourseService userCourseService;
+    @Autowired
+    UserCourseService userCourseService;
 
     @GetMapping("/users/{userId}/courses")
-    public ResponseEntity<Page<CourseDto>> getAllCoursesByUser(@PathVariable UUID userId,
-                                                               @PageableDefault(page = 0, size = 5, sort = "courseId",
-                                                                direction = Sort.Direction.ASC) Pageable pageable){
-
+    public ResponseEntity<Object> getAllCoursesByUser(@PathVariable UUID userId,
+                                                      @PageableDefault(page = 0, size = 5, sort = "courseId",
+                                                              direction = Sort.Direction.ASC) Pageable pageable){
+        Optional<User> userOptional = userService.findById(userId);
+        if(userOptional.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
         return ResponseEntity.status(HttpStatus.OK).body(courseClient.getAllCoursesByUser(userId, pageable));
     }
 
@@ -53,7 +56,7 @@ public class UserCourseController {
         }
 
         UserCourseModel userCourseModel = userCourseService.save(userOptional.get().convertToUserCourseModel(userCourseDto.getCourseId()));
-        return ResponseEntity.status(HttpStatus.OK).body(userCourseModel);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userCourseModel);
     }
 
     @DeleteMapping("users/courses/{courseId}")
