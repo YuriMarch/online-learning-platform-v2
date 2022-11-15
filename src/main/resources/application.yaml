@@ -7,7 +7,7 @@ spring:
   application:
     name: distancelearning-authuser-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/distancelearning-authuser
+    url: jdbc:postgresql://localhost:5432/distancelearning-authuser-v2
     username: postgres
     password: postgres
   jpa:
@@ -20,6 +20,8 @@ spring:
   output:
     ansi:
       enabled: Always
+  rabbitmq:
+    addresses: amqps://edchwiwa:PQjjRhmkiBn8wl0J6RFU-z7y7L7Xxs1B@sparrow.rmq.cloudamqp.com/edchwiwa
 
 logging:
   level:
@@ -32,6 +34,9 @@ distancelearning:
   api:
     url:
       course: 'http://distancelearning-course-service/distancelearning-course'
+  broker:
+    exchange:
+      userEvent: distancelearning.userevent
 
 eureka:
   client:

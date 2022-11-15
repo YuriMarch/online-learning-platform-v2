@@ -19,11 +19,13 @@ public interface UserService {
 
     void delete(User user);
 
-    void save(User user);
+    User save(User user);
 
     boolean existsByUsername(String username);
 
     boolean existsByEmail(String username);
 
     Page<User> findAllInstructors(SpecificationTemplate.UserSpec spec, Pageable pageable);
+
+    User saveUser(User user);
 }

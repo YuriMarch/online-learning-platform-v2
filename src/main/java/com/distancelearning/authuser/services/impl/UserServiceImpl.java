@@ -1,9 +1,9 @@
 package com.distancelearning.authuser.services.impl;
 
 import com.distancelearning.authuser.clients.CourseClient;
+import com.distancelearning.authuser.enums.ActionType;
 import com.distancelearning.authuser.models.User;
-import com.distancelearning.authuser.models.UserCourseModel;
-import com.distancelearning.authuser.repositories.UserCourseRepository;
+import com.distancelearning.authuser.publishers.UserEventPublisher;
 import com.distancelearning.authuser.repositories.UserRepository;
 import com.distancelearning.authuser.services.UserService;
 import com.distancelearning.authuser.specifications.SpecificationTemplate;
@@ -24,9 +24,9 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    private final UserCourseRepository userCourseRepository;
-
     private final CourseClient courseClient;
+
+    private final UserEventPublisher userEventPublisher;
 
     @Override
     public List<User> findAll() {
@@ -46,21 +46,12 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void delete(User user) {
-        boolean deleteUserCourseInCourse = false;
-        List<UserCourseModel> userCourseModelList = userCourseRepository.findAllUserCourseIntoUser(user.getUserId());
-        if (!userCourseModelList.isEmpty()){
-            userCourseRepository.deleteAll(userCourseModelList);
-            deleteUserCourseInCourse = true;
-        }
         userRepository.delete(user);
-        if (deleteUserCourseInCourse){
-            courseClient.deleteUserInCourse(user.getUserId());
-        }
     }
 
     @Override
-    public void save(User user) {
-        userRepository.save(user);
+    public User save(User user) {
+        return userRepository.save(user);
     }
 
     @Override
@@ -76,5 +67,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<User> findAllInstructors(SpecificationTemplate.UserSpec spec, Pageable pageable) {
         return userRepository.findAllInstructors(spec, pageable);
+    }
+
+    @Transactional
+    @Override
+    public User saveUser(User user) {
+        User userModel = save(user);
+        userEventPublisher.publishUserEvent(userModel.convertToUserEventDto(), ActionType.CREATE);
+        return userModel;
     }
 }
