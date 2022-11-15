@@ -35,7 +35,7 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<Page<User>> getAllUsers(SpecificationTemplate.UserSpec spec,
-                                                  @PageableDefault (page = 0, size = 5, sort = "userId",
+                                                  @PageableDefault (size = 5, sort = "userId",
                                                           direction = Sort.Direction.ASC) Pageable pageable){
         Page<User> userPage = userService.findAll(spec, pageable);
 
@@ -61,7 +61,7 @@ public class UserController {
         if(userOptional.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
         } else {
-            userService.delete(userOptional.get());
+            userService.deleteUser(userOptional.get());
             log.debug("DELETE deleteUserById userId received {}", userId);
             log.info("User successfully deleted userId: {}", userId);
             return ResponseEntity.status(HttpStatus.OK).body("User successfully deleted.");
@@ -82,7 +82,7 @@ public class UserController {
             user.setPhoneNumber(userDto.getPhoneNumber());
             user.setCpf(userDto.getCpf());
             user.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
-            userService.save(user);
+            userService.updateUser(user);
             log.debug("PUT updateUser userId received {}", user.getUserId());
             log.info("User updated successfully userId: {}", user.getUserId());
             return ResponseEntity.status(HttpStatus.OK).body(user);
@@ -103,7 +103,7 @@ public class UserController {
             var user = userOptional.get();
             user.setPassword(userDto.getPassword());
             user.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
-            userService.save(user);
+            userService.updatePassword(user);
             log.debug("PUT updatePassword userId received {}", user.getUserId());
             log.info("User password updated successfully userId: {}", user.getUserId());
             return ResponseEntity.status(HttpStatus.OK).body("Password successfully updated.");
@@ -121,7 +121,7 @@ public class UserController {
             var user = userOptional.get();
             user.setImageUrl(userDto.getImageUrl());
             user.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
-            userService.save(user);
+            userService.updateUser(user);
             log.debug("PUT updateImage userId received {}", user.getUserId());
             log.info("User image updated successfully userId: {}", user.getUserId());
             return ResponseEntity.status(HttpStatus.OK).body(user);

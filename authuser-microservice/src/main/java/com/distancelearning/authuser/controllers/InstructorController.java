@@ -38,14 +38,14 @@ public class InstructorController {
             var user = userOptional.get();
             user.setUserType(UserType.INSTRUCTOR);
             user.setLastUpdateDate(LocalDateTime.now(ZoneId.of("UTC")));
-            userService.save(user);
+            userService.updateUser(user);
             return ResponseEntity.status(HttpStatus.OK).body(user);
         }
     }
 
     @GetMapping
     public ResponseEntity<Page<User>> getAllInstructors(SpecificationTemplate.UserSpec spec,
-                                         @PageableDefault(page = 0, size = 5,
+                                         @PageableDefault(size = 5,
                                                           direction = Sort.Direction.ASC) Pageable pageable) {
         var instructorPage = userService.findAllInstructors(spec, pageable);
 
