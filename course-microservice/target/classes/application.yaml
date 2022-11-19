@@ -34,12 +34,6 @@ distancelearning:
   api:
     url:
       authuser: 'http://distancelearning-authuser-service/distancelearning-authuser'
-  broker:
-    exchange:
-      userEventExchange: distancelearning.userevent
-    queue:
-      userEventQueue:
-        name: distancelearning.userevent.ms.course
 
 eureka:
   client:

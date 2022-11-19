@@ -6,6 +6,7 @@ import com.distancelearning.course.services.CourseService;
 import com.distancelearning.course.specifications.SpecificationTemplate;
 import com.distancelearning.course.validation.CourseValidator;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,13 +23,11 @@ import java.time.ZoneId;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 @RestController
 @RequestMapping("/courses")
 @AllArgsConstructor
 @CrossOrigin(origins = "*", maxAge = 3600)
+@Log4j2
 public class CourseController {
 
     private final CourseService courseService;
@@ -81,13 +80,15 @@ public class CourseController {
 
     @GetMapping
     public ResponseEntity<Page<CourseModel>> getAllCourses(SpecificationTemplate.CourseSpec spec,
-                                                           @PageableDefault (size = 5, sort = "courseId",
+                                                           @PageableDefault (page = 0, size = 5, sort = "courseId",
                                                             direction = Sort.Direction.ASC) Pageable pageable,
                                                            @RequestParam(required = false) UUID userId){
         if (userId != null){
+            log.debug("Getting all courses for userId {}", userId);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(courseService.findAll(SpecificationTemplate.courseUserId(userId).and(spec), pageable));
         } else {
+            log.debug("Getting all courses.");
             return ResponseEntity.status(HttpStatus.OK).body(courseService.findAll(spec, pageable));
         }
     }

@@ -1,5 +1,6 @@
 package com.distancelearning.authuser.services.impl;
 
+import com.distancelearning.authuser.clients.CourseClient;
 import com.distancelearning.authuser.enums.ActionType;
 import com.distancelearning.authuser.models.User;
 import com.distancelearning.authuser.publishers.UserEventPublisher;
@@ -22,6 +23,8 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+
+    private final CourseClient courseClient;
 
     private final UserEventPublisher userEventPublisher;
 
@@ -72,26 +75,5 @@ public class UserServiceImpl implements UserService {
         User userModel = save(user);
         userEventPublisher.publishUserEvent(userModel.convertToUserEventDto(), ActionType.CREATE);
         return userModel;
-    }
-
-    @Transactional
-    @Override
-    public void deleteUser(User user) {
-        delete(user);
-        userEventPublisher.publishUserEvent(user.convertToUserEventDto(), ActionType.DELETE);
-
-    }
-
-    @Transactional
-    @Override
-    public User updateUser(User user) {
-        User userModel = save(user);
-        userEventPublisher.publishUserEvent(userModel.convertToUserEventDto(), ActionType.UPDATE);
-        return userModel;
-    }
-
-    @Override
-    public User updatePassword(User user) {
-        return save(user);
     }
 }

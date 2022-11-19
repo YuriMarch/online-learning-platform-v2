@@ -6,6 +6,7 @@ import com.distancelearning.course.models.ModuleModel;
 import com.distancelearning.course.repositories.CourseRepository;
 import com.distancelearning.course.repositories.LessonRepository;
 import com.distancelearning.course.repositories.ModuleRepository;
+import com.distancelearning.course.repositories.UserRepository;
 import com.distancelearning.course.services.CourseService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -61,16 +62,5 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Page<CourseModel> findAll(Specification<CourseModel> spec, Pageable pageable) {
         return courseRepository.findAll(spec, pageable);
-    }
-
-    @Override
-    public boolean existsByCourseAndUser(UUID courseId, UUID userId) {
-        return courseRepository.existsByCourseAndUser(courseId, userId);
-    }
-
-    @Transactional
-    @Override
-    public void saveSubscriptionUserInCourse(UUID courseId, UUID userId) {
-        courseRepository.saveCourseUser(courseId, userId);
     }
 }
