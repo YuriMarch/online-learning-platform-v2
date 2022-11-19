@@ -22,7 +22,7 @@ import java.time.ZoneId;
 @AllArgsConstructor
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Log4j2
-public class AuthenticationController {
+public class  AuthenticationController {
 
     private final UserService userService;
 
