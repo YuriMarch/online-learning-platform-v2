@@ -1,5 +1,9 @@
 package com.distancelearning.authuser.controllers;
 
+import com.distancelearning.authuser.configs.security.AuthenticationEntryPointImpl;
+import com.distancelearning.authuser.configs.security.JwtProvider;
+import com.distancelearning.authuser.dtos.JwtDto;
+import com.distancelearning.authuser.dtos.LoginDto;
 import com.distancelearning.authuser.dtos.UserDto;
 import com.distancelearning.authuser.enums.RoleType;
 import com.distancelearning.authuser.enums.UserStatus;
@@ -14,10 +18,15 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
@@ -27,12 +36,11 @@ import java.time.ZoneId;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @Log4j2
 public class  AuthenticationController {
-
     private final UserService userService;
-
     private final RoleService roleService;
-
     private final PasswordEncoder passwordEncoder;
+    private final JwtProvider jwtProvider;
+    private final AuthenticationManager authenticationManager;
 
     @PostMapping("/signup")
     public ResponseEntity<Object> registerUser(@RequestBody
@@ -64,5 +72,14 @@ public class  AuthenticationController {
         log.debug("POST registerUser userId received {}", user.getUserId());
         log.info("User saved successfully userId: {}", user.getUserId());
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<JwtDto> authenticateUser(@Valid @RequestBody LoginDto loginDto){
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtProvider.generateJwt(authentication);
+        return ResponseEntity.ok(new JwtDto(jwt));
     }
 }
