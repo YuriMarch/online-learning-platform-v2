@@ -28,4 +28,8 @@ public interface UserService {
     Page<User> findAllInstructors(SpecificationTemplate.UserSpec spec, Pageable pageable);
 
     User saveUser(User user);
+
+    void deleteUser(User user);
+    User updateUser(User user);
+    User updatePassword(User user);
 }

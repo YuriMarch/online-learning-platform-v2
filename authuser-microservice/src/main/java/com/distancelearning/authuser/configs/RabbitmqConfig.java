@@ -35,7 +35,7 @@ public class RabbitmqConfig {
     }
 
     @Bean
-    public FanoutExchange fanoutExchange(){
+    public FanoutExchange fanoutUserEvent(){
         return new FanoutExchange(exchangeUserEvent);
     }
 }
