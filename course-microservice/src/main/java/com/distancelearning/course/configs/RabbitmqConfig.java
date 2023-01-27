@@ -16,7 +16,7 @@ public class RabbitmqConfig {
     CachingConnectionFactory cachingConnectionFactory;
 
     @Bean
-    public RabbitTemplate RabbitTemplate(){
+    public RabbitTemplate rabbitTemplate(){
         RabbitTemplate rabbitTemplate = new RabbitTemplate(cachingConnectionFactory);
         rabbitTemplate.setMessageConverter(messageConverter());
         return rabbitTemplate;

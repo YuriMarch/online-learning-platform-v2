@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -34,6 +35,7 @@ public class ModuleController {
     private final ModuleService moduleService;
     private final CourseService courseService;
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @PostMapping
     public ResponseEntity<Object> saveModule(@RequestBody @Valid ModuleDto moduleDto,
                                              @PathVariable(value = "courseId") UUID courseId) {
@@ -49,6 +51,7 @@ public class ModuleController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @DeleteMapping("/{moduleId}")
     public ResponseEntity<Object> deleteModule(@PathVariable(value = "moduleId") UUID moduleId,
                                                @PathVariable(value = "courseId") UUID courseId){
@@ -61,6 +64,7 @@ public class ModuleController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @PutMapping("/{moduleId}")
     public ResponseEntity<Object> updateModule(@PathVariable(value = "moduleId") UUID moduleId,
                                                @PathVariable(value = "courseId") UUID courseId,
@@ -76,6 +80,7 @@ public class ModuleController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping
     public ResponseEntity<Page<ModuleModel>> getAllModules(@PathVariable(value = "courseId") UUID courseId,
                                                            SpecificationTemplate.ModuleSpec spec,
@@ -90,6 +95,7 @@ public class ModuleController {
         return ResponseEntity.status(HttpStatus.OK).body(modulePage);
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping("/{moduleId}")
     public ResponseEntity<Object> getModuleById(@PathVariable(value = "moduleId") UUID moduleId,
                                                 @PathVariable(value = "courseId") UUID courseId){

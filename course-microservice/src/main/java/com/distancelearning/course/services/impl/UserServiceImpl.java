@@ -5,6 +5,7 @@ import com.distancelearning.course.repositories.CourseRepository;
 import com.distancelearning.course.repositories.UserRepository;
 import com.distancelearning.course.services.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -14,13 +15,14 @@ import javax.transaction.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
-@AllArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository userRepository;
+    @Autowired
+    UserRepository userRepository;
 
-    private final CourseRepository courseRepository;
+    @Autowired
+    CourseRepository courseRepository;
 
     @Override
     public Page<UserModel> findAll(Specification<UserModel> spec, Pageable pageable) {

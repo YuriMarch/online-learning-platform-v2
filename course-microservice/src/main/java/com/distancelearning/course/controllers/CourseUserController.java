@@ -1,7 +1,9 @@
 package com.distancelearning.course.controllers;
 
 import com.distancelearning.course.dtos.SubscriptionDto;
+import com.distancelearning.course.enums.UserStatus;
 import com.distancelearning.course.models.CourseModel;
+import com.distancelearning.course.models.UserModel;
 import com.distancelearning.course.services.CourseService;
 import com.distancelearning.course.services.UserService;
 import com.distancelearning.course.specifications.SpecificationTemplate;
@@ -49,7 +51,21 @@ public class CourseUserController {
         if(courseModelOptional.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Course not found.");
         }
-        //implement verification using state transfer
+
+        if (courseService.existsByCourseAndUser(courseId, subscriptionDto.getUserId())){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: subscription already exists.");
+        }
+
+        Optional<UserModel> userModelOptional = userService.findById(subscriptionDto.getUserId());
+        if (userModelOptional.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
+
+        if (userModelOptional.get().getUserStatus().equals(UserStatus.BLOCKED.toString())){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("User is blocked.");
+        }
+
+        courseService.saveSubscriptionUserInCourseAndSendNotification(courseModelOptional.get(), userModelOptional.get());
         return ResponseEntity.status(HttpStatus.CREATED).body("Subscription created successfully.");
     }
 }
