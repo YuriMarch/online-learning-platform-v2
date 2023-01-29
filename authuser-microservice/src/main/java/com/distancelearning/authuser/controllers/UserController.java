@@ -1,5 +1,7 @@
 package com.distancelearning.authuser.controllers;
 
+import com.distancelearning.authuser.configs.security.AuthenticationCurrentUserService;
+import com.distancelearning.authuser.configs.security.UserDetailsImpl;
 import com.distancelearning.authuser.dtos.UserDto;
 import com.distancelearning.authuser.models.User;
 import com.distancelearning.authuser.services.UserService;
@@ -13,6 +15,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,11 +38,17 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class UserController {
 
     private final UserService userService;
+    private final AuthenticationCurrentUserService authenticationCurrentUserService;
 
+    @PreAuthorize("hasAnyRole('INSTRUCTOR')")
     @GetMapping
     public ResponseEntity<Page<User>> getAllUsers(SpecificationTemplate.UserSpec spec,
-                                                  @PageableDefault (page = 0, size = 5, sort = "userId",
-                                                          direction = Sort.Direction.ASC) Pageable pageable){
+                                                  @PageableDefault (page = 0, size = 5, sort = "userId", direction = Sort.Direction.ASC) Pageable pageable,
+                                                  Authentication authentication){
+        UserDetails userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        log.info("Authentication {}", userDetails.getUsername());
+        log.info(userDetails);
+
         Page<User> userPage = userService.findAll(spec, pageable);
 
         //Hateoas implementation
@@ -48,10 +60,20 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userPage);
     }
 
+    @PreAuthorize("hasAnyRole('STUDENT')")
     @GetMapping("/{userId}")
     public ResponseEntity<Object> getUserById(@PathVariable UUID userId) {
-        Optional<User> userOptional = userService.findById(userId);
-        return userOptional.<ResponseEntity<Object>>map(user -> ResponseEntity.status(HttpStatus.OK).body(user)).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found."));
+        UUID currentUserId = authenticationCurrentUserService.getCurrentUser().getUserId();
+        if (currentUserId.equals(userId)){
+            Optional<User> userOptional = userService.findById(userId);
+            if (userOptional.isEmpty()){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+            } else {
+                return ResponseEntity.status(HttpStatus.OK).body(userOptional.get());
+            }
+        } else {
+            throw new AccessDeniedException("Forbidden access.");
+        }
     }
 
     @DeleteMapping("/{userId}")

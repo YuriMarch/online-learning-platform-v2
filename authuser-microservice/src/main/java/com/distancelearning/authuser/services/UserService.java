@@ -17,6 +17,8 @@ public interface UserService {
 
     Optional<User> findById(UUID userId);
 
+    Optional<User> findByUserId(UUID userId);
+
     void delete(User user);
 
     User save(User user);

@@ -1,10 +1,7 @@
 package com.distancelearning.authuser.configs.security;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.UUID;
 
 @Log4j2
 public class AuthenticationJwtFilter extends OncePerRequestFilter {
@@ -31,8 +29,8 @@ public class AuthenticationJwtFilter extends OncePerRequestFilter {
         try {
             String jwtString = getTokenHeader(request);
             if (jwtString != null && jwtProvider.validateJwt(jwtString)){
-                String username = jwtProvider.getUsername(jwtString);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                String userId = jwtProvider.getSubjectJwt(jwtString);
+                UserDetails userDetails = userDetailsService.loadUserByUserId(UUID.fromString(userId));
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
